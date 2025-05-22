@@ -1,30 +1,29 @@
-name: Scrum CI
-on: [push, pull_request]
+name: Django CD
+
+on:
+  workflow_run:
+    workflows: ["Django CI"]  # Le nom EXACT du workflow CI 
+    types:
+      - completed
 
 jobs:
-  build:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     services:
       mysql:
         image: mysql:8.0
-        ports:
-          - 3306:3306
         env:
           MYSQL_DATABASE: dbscrum
           MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-
-    env:
-      DB_NAME: dbscrum
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
 
     steps:
       - name: Checkout code
@@ -40,7 +39,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-
-      - name: Run tests
+      - name: Simulation de déploiement
         run: |
-          pytest apps/**/tests/
+          echo "Déploiement de l'application sur le serveur de production"
+          echo "Connexion à la base de données MySQL"
+          echo "Exécution des migrations"
+          echo "Démarrage du serveur Django"
+          echo "Application déployée avec succès !"
