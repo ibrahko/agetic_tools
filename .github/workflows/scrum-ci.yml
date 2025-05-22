@@ -1,8 +1,10 @@
 name: Scrum CI
 on: [push, pull_request]
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     services:
       mysql:
         image: mysql:8.0
@@ -11,13 +13,18 @@ jobs:
         env:
           MYSQL_DATABASE: dbscrum
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: root
-          MYSQL_PASSWORD: ""
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+
+    env:
+      DB_NAME: dbscrum
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
 
     steps:
       - name: Checkout code
