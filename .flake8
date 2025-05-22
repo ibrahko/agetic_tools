@@ -1,0 +1,27 @@
+[flake8]
+exclude = 
+    .git,
+    __pycache__,
+    env,
+    scrumenv,
+    migrations,
+    manage.py
+max-line-length = 88
+ignore = 
+    E203,
+    W503,
+    F403,
+    E302,
+    F405,
+    W292,
+    E501,
+    W291,
+    F401,
+    W293,
+    E261,
+    E265,
+    F811,
+    E722,
+    E272,
+    E303,
+    E222
