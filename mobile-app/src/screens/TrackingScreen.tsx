@@ -1,20 +1,50 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native';
 import { Ruler, CalendarClock } from 'lucide-react-native';
 import { StatusTimeline } from '../components/StatusTimeline';
 import { colors } from '../theme/colors';
-import { Commande } from '../types/domain';
+import { Commande, CommandeStatut } from '../types/domain';
+
+const STEPS: CommandeStatut[] = [
+  'acompte_en_attente',
+  'mesures_validees',
+  'coupe_en_cours',
+  'assemblage',
+  'finitions',
+  'pret_pour_retrait',
+];
 
 type Props = {
   commande: Commande;
 };
 
 export default function TrackingScreen({ commande }: Props) {
+  const { progressPercent, stepLabel } = useMemo(() => {
+    const stepIndex = Math.max(0, STEPS.findIndex((step) => step === commande.statut));
+    const progress = Math.round((stepIndex / (STEPS.length - 1)) * 100);
+
+    return {
+      progressPercent: progress,
+      stepLabel: `${stepIndex + 1}/${STEPS.length} étapes`,
+    };
+  }, [commande.statut]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>Suivi de ma tenue</Text>
         <Text style={styles.reference}>Commande #{commande.reference}</Text>
+
+        <View style={styles.progressCard}>
+          <View style={styles.progressHeader}>
+            <Text style={styles.progressTitle}>Progression atelier</Text>
+            <Text style={styles.progressValue}>{progressPercent}%</Text>
+          </View>
+          <View style={styles.progressBarTrack}>
+            <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
+          </View>
+          <Text style={styles.progressMeta}>{stepLabel}</Text>
+        </View>
 
         <View style={styles.metaRow}>
           <View style={styles.metaCard}>
@@ -49,6 +79,44 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 15,
     marginBottom: 20,
+  },
+  progressCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+    marginBottom: 14,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  progressTitle: {
+    color: colors.textSecondary,
+    fontSize: 13,
+  },
+  progressValue: {
+    color: colors.textPrimary,
+    fontWeight: '700',
+  },
+  progressBarTrack: {
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: colors.border,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: colors.accentGold,
+  },
+  progressMeta: {
+    marginTop: 8,
+    color: colors.textSecondary,
+    fontSize: 12,
   },
   metaRow: {
     flexDirection: 'row',
