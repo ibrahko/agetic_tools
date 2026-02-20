@@ -28,6 +28,10 @@ mobile-app/
 │   │   └── typography.ts
 │   └── types/
 │       └── domain.ts                  # Types métier (Commande, Mesures...)
+├── supabase/
+│   ├── migrations/
+│   │   └── 20260220_init_couture.sql  # Schéma SQL (tables + triggers)
+│   └── seed.sql
 ├── assets/
 │   └── branding/
 │       └── logo-gold.png
@@ -39,3 +43,4 @@ mobile-app/
 - **Domain-driven UI** : séparation des écrans, composants, services, thèmes.
 - **Supabase realtime-first** : écoute temps réel sur `commandes` pour rafraîchir le suivi client.
 - **Design system luxe** : palette Or / Blanc cassé / Noir et composants homogènes.
+- **Sécurité des données** : policies RLS sur les profils, paiements et commandes.

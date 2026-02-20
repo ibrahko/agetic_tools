@@ -28,6 +28,25 @@ create table if not exists public.modeles (
   updated_at timestamptz not null default now()
 );
 
+-- 2.1) Interactions sociales (likes + commentaires)
+create table if not exists public.modele_likes (
+  id uuid primary key default gen_random_uuid(),
+  modele_id uuid not null references public.modeles(id) on delete cascade,
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (modele_id, profile_id)
+);
+
+create table if not exists public.modele_commentaires (
+  id uuid primary key default gen_random_uuid(),
+  modele_id uuid not null references public.modeles(id) on delete cascade,
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  contenu text not null,
+  parent_id uuid references public.modele_commentaires(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- 3) Commandes clients
 create table if not exists public.commandes (
   id uuid primary key default gen_random_uuid(),
@@ -106,6 +125,8 @@ create index if not exists idx_commandes_client on public.commandes(client_id);
 create index if not exists idx_commandes_statut on public.commandes(statut);
 create index if not exists idx_paiements_commande on public.paiements(commande_id);
 create index if not exists idx_mesures_client on public.mesures(client_id);
+create index if not exists idx_modele_likes_modele on public.modele_likes(modele_id);
+create index if not exists idx_modele_commentaires_modele on public.modele_commentaires(modele_id);
 
 -- Trigger helper: updated_at automatique
 create or replace function public.set_updated_at()
@@ -124,6 +145,10 @@ for each row execute function public.set_updated_at();
 
 create trigger trg_modeles_updated_at
 before update on public.modeles
+for each row execute function public.set_updated_at();
+
+create trigger trg_commentaires_updated_at
+before update on public.modele_commentaires
 for each row execute function public.set_updated_at();
 
 create trigger trg_commandes_updated_at
